@@ -1,19 +1,20 @@
 import os
 import json
-from api_handler import APIHandler
-from utils import sanitize_input, verify_response
+from api_handler import AzureAPIHandler
+from llmutils import sanitize_input, verify_response
 
 def main():
     """Main function to handle question submission and training data."""
 
     # Ensure you set your API key
-    api_key = os.getenv("OPENAI_API_KEY")
-    api_handler = APIHandler(api_key)
+    api_key = os.environ.get('AZURE_OPENAI_API_KEY')
+    api_handler = AzureAPIHandler()
 
     # Submit a question
     question = "What is the capital of France?"
+    csv_path = "data/training_data.csv"
     sanitized_question = sanitize_input(question)
-    response = api_handler.submit_question(sanitized_question)
+    response = api_handler.submit_question(question=sanitized_question, csv_path=csv_path)
     print("Question Response:")
     print(response)
 
