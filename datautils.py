@@ -36,3 +36,6 @@ def generate_training_test_data(data_dir, dataset_name, rand_seed):
     y_test = test.drop(columns=input_cols)
    
     return X_train, y_train, X_test, y_test
+
+X_train, y_train, X_test, y_test = generate_training_test_data(data_dir='datasets', dataset_name='indices-of-substring', rand_seed=42)
+print(X_train, y_train, X_test, y_test)
