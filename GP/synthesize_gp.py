@@ -7,7 +7,7 @@ from pyshgp.gp.estimators import PushEstimator
 from pyshgp.gp.genome import GeneSpawner
 from pyshgp.push.instruction_set import InstructionSet
 
-import utils
+import datautils
 
 # Our recommendation is to use 200 example cases for the training set (including all hand-chosen
 # inputs) and 2000 for the unseen test set. We recommend a budget of 60 million program executions; 
@@ -31,7 +31,7 @@ spawner = GeneSpawner(
 
 
 if __name__ == "__main__":
-    X_train, y_train, X_test, y_test = utils.generate_training_test_data("../Datasets/PSB2/datasets", "gcd", 42)
+    X_train, y_train, X_test, y_test = datautils.generate_training_test_data("../Datasets/PSB2/datasets", "gcd", 42)
 
     est = PushEstimator(
         search="GA",
