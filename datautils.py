@@ -1,8 +1,7 @@
 import pandas as pd
-
+import psb2
 
 PSB2_DATASETS = ['basement', 'bouncing-balls', 'bowling', 'camel-case', 'coin-sums', 'cut-vector', 'dice-game', 'find-pair', 'fizz-buzz', 'fuel-cost', 'gcd',  'indices-of-substring',  'leaders', 'luhn', 'mastermind',  'middle-character',  'paired-digits', 'shopping-list', 'snow-day',  'solve-boolean', 'spin-words', 'square-digits','substitution-cipher', 'twitter', 'vector-distance']
-
 
 def generate_training_test_data(data_dir, dataset_name, rand_seed):
     '''
