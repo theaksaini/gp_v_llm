@@ -1,5 +1,4 @@
 import pandas as pd
-import psb2
 import csv
 
 PSB2_DATASETS = ['basement', 'bouncing-balls', 'bowling', 'camel-case', 'coin-sums', 'cut-vector', 'dice-game', 'find-pair', 'fizz-buzz', 'fuel-cost', 'gcd',  'indices-of-substring',  'leaders', 'luhn', 'mastermind',  'middle-character',  'paired-digits', 'shopping-list', 'snow-day',  'solve-boolean', 'spin-words', 'square-digits','substitution-cipher', 'twitter', 'vector-distance']
@@ -25,17 +24,21 @@ def generate_training_test_data(data_dir, dataset_name, rand_seed):
     # Ensure we have 200 training cases
     train = pd.concat([edge_case, random_cases.sample(n=200 - len(edge_case), random_state=rand_seed)])
     input_cols = [col for col in train.columns if col.startswith("input")]
+    train.to_csv(f"{data_dir}/{dataset_name}/{dataset_name}_train.csv", index=False)
     X_train = train[input_cols]
     y_train = train.drop(columns=input_cols)
+    
 
 
     # Ensure we have 2000 test cases
     test = random_cases.sample(n=2000, random_state=rand_seed)
     input_cols = [col for col in test.columns if col.startswith("input")]
+    train.to_csv(f"{data_dir}/{dataset_name}/{dataset_name}_test.csv", index=False)
     X_test = test[input_cols]
     y_test = test.drop(columns=input_cols)
-   
+
     return X_train, y_train, X_test, y_test
 
 X_train, y_train, X_test, y_test = generate_training_test_data(data_dir='datasets', dataset_name='indices-of-substring', rand_seed=42)
 print(X_train, y_train, X_test, y_test)
+

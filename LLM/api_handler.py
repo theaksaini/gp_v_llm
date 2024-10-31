@@ -14,14 +14,14 @@ logging.basicConfig(
 class AzureAPIHandler:
     def __init__(self, api_key=None, base_url=None, 
                 api_version=None, deployment_name=None):
-        self.api_key = api_key or os.environ.get('AZURE_OPENAI_API_KEY')
-        self.base_url = base_url or os.environ.get('AZURE_OPENAI_ENDPOINT')
-        self.api_version = api_version or "2024-02-01"
-        self.model = deployment_name or "gketron-4o"
+        self.api_key = os.environ.get('AZURE_OPENAI_API_KEY')
+        self.base_url = os.environ.get('AZURE_OPENAI_ENDPOINT')
+        self.api_version = "2024-02-01"
+        self.model = "gketron-4o"
         self.client = openai.AzureOpenAI(
-            azure_endpoint=self.base_url,
-            api_key=self.api_key,
-            api_version=self.api_version
+            azure_endpoint=os.environ.get('AZURE_OPENAI_ENDPOINT'),
+            api_key=os.environ.get('AZURE_OPENAI_API_KEY'),
+            api_version="2024-02-01"
         )
 
     def submit_question(self, question, csv_path, iteration = 42):
@@ -36,16 +36,16 @@ class AzureAPIHandler:
         # Here, you might log, process, or visualize for fine-tuning contexts
 
         query = question
-        general_role_prompt = "You are an assistant that generates Python functions to create correct outputs based on a series of examples inputs proved to you. Each row contains a unique example containing string inputs, and a string output for you to learn and write a function from. Write the function in the following format only: def my_func(input1: str, input2:str) -> str: \n    #To be completed by you.\n    return output"
+        general_role_prompt = "You are an assistant that generates Python functions to create correct outputs based on a series of examples inputs proved to you in the Context and instructions given by the Query. Each row contains a unique example containing string inputs, and a string output for you to learn and write a function from. Write the function in the following format: def my_func(input1: str, input2:str): \n    #To be completed by you.\n    return output"
 
         sample_interaction = """
         User: Context: {"row 1": {"input1": "a", "input2": "b", "output": "c"}, "row 2": {"input1": "c", "input2": "d", "output": "e"}, ...}"\n\n Query: Given two strings, input1 and input2, return the next character after input2 in the alphabet as a string."
-        Assistant: def my_func(input1: str, input2:str) -> str: \n    if input2 == "z":\n    output = chr(ord(input2)-25))\n\n    else:\n    output = chr(ord(input2)+1)\n    return output
+        Assistant: def my_func(input1: str, input2:str): \n    if input2 == "z":\n    output = chr(ord(input2)-25))\n\n    else:\n    output = chr(ord(input2)+1)\n    return output
         """
 
         conversation = [
             {"role": "system", "content": general_role_prompt},
-            {"role": "assistant", "content": sample_interaction},
+            #{"role": "assistant", "content": sample_interaction},
             {"role": "user", "content": "Context: " + context + "\n\n Query: " + query}
         ]
 
