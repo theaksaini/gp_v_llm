@@ -1,0 +1,26 @@
+Problem,Instructions,exec,integer,float,Boolean,char,string,vector of integers,vector of floats,Constants and ERCs,n_inputs,n_ouputs
+Basement,117,1,1,0,1,0,0,1,0,"[], -1, 0, 1, integer ERC",1,1
+Bouncing Balls,127,1,1,1,1,0,0,0,0,"0.0, 1.0, 2.0",3,1
+Bowling,161,1,1,0,1,1,1,0,0,"\-, \X, \/, \1, \2, \3, \4, \5, \6, \7, \8, \9, \10, integer ERC",1,1
+Camel Case,151,1,1,0,1,1,1,0,0,"\-, \space, visible character ERC, string ERC",1,1
+Coin Suns,86,1,1,0,1,0,0,0,0,"0, 1, 5, 10, 25",1,4
+Cut Vecror,116,1,1,0,1,0,0,1,0,"[], 0",1,2
+Dice Game,125,1,1,1,1,0,0,0,0,"0.0, 1.0",2,1
+Find Pair,120,1,1,0,1,0,0,1,0,"-1, 0, 1, 2, integer ERC",2,2
+Fizz Buzz,118,1,1,0,1,0,1,0,0,"Fizz, ""Buzz"", ""FizzBuzz"", 0, 3, 5",1,1
+Fuel Cost,117,1,1,0,1,0,0,1,0,"0, 1, 2, 3, integer ERC",1,1
+GCD,79,1,1,0,1,0,0,0,0,integer ERC,2,1
+Indices of Substring,184,1,1,0,1,1,1,1,0,"[], """", 0, 1",2,1
+Leaders,114,1,1,0,1,0,0,1,0,"[], vector ERC",1,1
+Luhn,117,1,1,0,1,0,0,1,0,"0, 2, 9, 10, integer ERC",1,1
+Mastermind,123,1,1,0,1,1,1,0,0,"0, 1, \B, \R, \W, \Y, \O, \G",2,2
+Middle Character,151,1,1,0,1,1,1,0,0,""""", 0, 1, 2, integer ERC",1,1
+Paired Digits,149,1,1,0,1,1,1,0,0,"0, char digit ERC, integer ERC",1,1
+Shopping List,161,1,1,1,1,0,0,0,1,"0.0, 100.0, float ERC",2,1
+Snow Day,131,1,1,1,1,0,0,0,0,"0, 1, -1, 0.0, 1.0, -1.0",4,1
+Solve Boolean,153,1,1,0,1,1,1,0,0,"true, false, \t, \f, \&, \|",1,1
+Spin Words,152,1,1,0,1,1,1,0,0,"4, 5, \space, visible character ERC, string ERC",1,1
+Square Digits,151,1,1,0,1,1,1,0,0,""""", 0, 1, 2, integer ERC",1,1
+Substitution Ciper,151,1,1,0,1,1,1,0,0,""""", 0",3,1
+Twitter,153,1,1,0,1,1,1,0,0,"0, 140, ""Too many characters"", ""You didn’t type  anything"", ""your tweet has "" , "" characters""",1,1
+Vector Distance,160,1,1,1,1,0,0,0,1,"[], 0",2,1

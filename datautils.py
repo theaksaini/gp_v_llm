@@ -1,5 +1,6 @@
 import pandas as pd
-import psb2
+from pyshgp.push.instruction_set import InstructionSet
+import GP.gp_utils as gp_utils
 
 PSB2_DATASETS = ['basement', 'bouncing-balls', 'bowling', 'camel-case', 'coin-sums', 'cut-vector', 'dice-game', 'find-pair', 'fizz-buzz', 'fuel-cost', 'gcd',  'indices-of-substring',  'leaders', 'luhn', 'mastermind',  'middle-character',  'paired-digits', 'shopping-list', 'snow-day',  'solve-boolean', 'spin-words', 'square-digits','substitution-cipher', 'twitter', 'vector-distance']
 
@@ -35,3 +36,38 @@ def generate_training_test_data(data_dir, dataset_name, rand_seed):
     y_test = test.drop(columns=input_cols)
    
     return X_train, y_train, X_test, y_test
+
+
+def get_problem_metadata(metadata_file, problem):
+    """Extracts the relevant information from the datasets_info.csv file for a given problem, to be passed to the GeneSpawner constructor."""
+    
+    datasets_info = pd.read_csv(metadata_file)
+
+    # Change the 'Problem' column to lowercase, and replace spaces with hyphens
+    datasets_info["Problem"] = datasets_info["Problem"].str.lower().str.replace(" ", "-")
+
+    # Filter the datasets_info DataFrame to only include the rows with the problem name
+    datasets_info = datasets_info[datasets_info["Problem"] == problem]
+
+    n_inputs = int(datasets_info["n_inputs"].values[0])
+    
+    instruction_types = ["exec", "integer",  "float", "Boolean", "char",  "string",  "vector of integers",  "vector of floats"]
+    instructions_columns = datasets_info[instruction_types]
+    instruction_set = set(instructions_columns.columns[instructions_columns.eq(1).any()])
+
+    literals = datasets_info["Constants and ERCs"].values[0].split(", ")
+    # Partition the 'literals' list into two lists: one for the string with end with 'ERC' and one for the rest
+    erc_literals= [literal for literal in literals if literal.endswith("ERC")]
+    erc_generators = [getattr(gp_utils, literal.replace(" ", "_")) for literal in erc_literals]
+
+    # Assert that the erc_generators list contains functions
+    assert all([callable(erc_generator) for erc_generator in erc_generators])
+
+    non_erc_literals = [literal for literal in literals if not literal.endswith("ERC")]
+
+    return {
+        "n_inputs": n_inputs,
+        "instruction_set": InstructionSet().register_core_by_stack(instruction_set),
+        "literals": non_erc_literals,
+        "erc_generators": erc_generators,
+    }
