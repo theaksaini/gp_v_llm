@@ -5,11 +5,12 @@ def sanitize_input(input_text):
     sanitized_text = re.sub(r'[^\w\s]', '', input_text)
     return sanitized_text.strip()
 
-def verify_response(response_json):
+def verify_response(response):
     try:
-        script = response_json.get("choices", [{}])[0].get("text", "").strip()
+        script = response[response.find('```python')+len('```python'):]
+        re = script.split('```')
         if "def " in script and "my_func" in script:
-            return script
+            return True, re[0]
     except (IndexError, KeyError):
         pass
-    return None
+    return False, ''

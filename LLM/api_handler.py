@@ -12,7 +12,7 @@ logging.basicConfig(
 )
 
 class AzureAPIHandler:
-    def __init__(self, api_key=None, base_url=None, 
+    def __init__(self, dataset_name, api_key=None, base_url=None, 
                 api_version=None, deployment_name=None):
         self.api_key = os.environ.get('AZURE_OPENAI_API_KEY')
         self.base_url = os.environ.get('AZURE_OPENAI_ENDPOINT')
@@ -23,65 +23,190 @@ class AzureAPIHandler:
             api_key=os.environ.get('AZURE_OPENAI_API_KEY'),
             api_version="2024-02-01"
         )
+        self.name = dataset_name
 
-    def submit_question(self, question, csv_path, iteration = 42):
+    def submit_question(self, question, csv_path, portion, iteration = 42, ):
+        self.iteration = iteration
         # Sanitize the input and log the action
-        question = sanitize_input(question)
-        logging.info("Submitting question to OpenAI API: %s", question)
+        question_out = sanitize_input(question[0])
+        #logging.info("Submitting question to OpenAI API: %s", question)
 
         # Read CSV data
         df = pd.read_csv(csv_path)
+        #json
+        indexing = {}
+        for i in range(len(df)):
+            indexing.update({i: f'Example {i}'})
+        
+        df = df.rename(index=indexing)
         context = df.to_json(orient="index")
-        logging.info("Submitting csv to OpenAI API: %s", df)
-        # Here, you might log, process, or visualize for fine-tuning contexts
 
-        query = question
-        general_role_prompt = "You are an assistant that generates Python functions to create correct outputs based on a series of examples inputs proved to you in the Context and instructions given by the Query. Each row contains a unique example containing string inputs, and a string output for you to learn and write a function from. Write the function in the following format: def my_func(input1: str, input2:str): \n    #To be completed by you.\n    return output"
+        assertstring = ""
+        #assert text
+        for i in range(len(df)):
+            assertstring += "assert my_func("
+            for j in range(len(df.columns)):
+                if df.columns[j][0] == 'i':
+                    value = df.iloc[i, j]
+                    assertstring += f'{value}'
+                    if df.columns[j+1][0] == 'o':
+                        assertstring += ') == '
+                    else:
+                        assertstring += ','
+                else:
+                    value = df.iloc[i, j]
+                    assertstring += f'{value}'
+                    if j+1 != len(df.columns):
+                        assertstring += ','
+                    else:
+                        assertstring += '\n'
+                    
+        noassertstring = ""
+        #assert text
+        for i in range(len(df)):
+            noassertstring += "my_func("
+            for j in range(len(df.columns)):
+                if df.columns[j][0] == 'i':
+                    value = df.iloc[i, j]
+                    noassertstring += f'{value}'
+                    if df.columns[j+1][0] == 'o':
+                        noassertstring += ') == '
+                    else:
+                        noassertstring += ','
+                else:
+                    value = df.iloc[i, j]
+                    noassertstring += f'{value}'
+                    if j+1 != len(df.columns):
+                        noassertstring += ','
+                    else:
+                        noassertstring += '\n'
 
-        sample_interaction = """
-        User: Context: {"row 1": {"input1": "a", "input2": "b", "output": "c"}, "row 2": {"input1": "c", "input2": "d", "output": "e"}, ...}"\n\n Query: Given two strings, input1 and input2, return the next character after input2 in the alphabet as a string."
-        Assistant: def my_func(input1: str, input2:str): \n    if input2 == "z":\n    output = chr(ord(input2)-25))\n\n    else:\n    output = chr(ord(input2)+1)\n    return output
-        """
+        returnstring = ""
+        #assert text
+        for i in range(len(df)):
+            returnstring += "my_func("
+            for j in range(len(df.columns)):
+                if df.columns[j][0] == 'i':
+                    value = df.iloc[i, j]
+                    returnstring += f'{value}'
+                    if df.columns[j+1][0] == 'o':
+                        returnstring += ') returns '
+                    else:
+                        returnstring += ','
+                else:
+                    value = df.iloc[i, j]
+                    returnstring += f'{value}'
+                    if j+1 != len(df.columns):
+                        returnstring += ','
+                    else:
+                        returnstring += '\n'
+
+        #pure text
+        textstring = "```" + df.columns.values + "\n"
+        for i in range(len(df)):
+            for j in range(len(df.columns)):
+                textstring += f'{df.iloc[i, j]}'
+                if j+1 != len(df.columns):
+                            textstring += ','
+                else:
+                    textstring += '\n'
+        textstring += "```"
+
+        #context text
+        contextstring = "```\n| "
+        for j in range(len(df.columns)):
+            contextstring += df.columns[j]
+            if j+1 != len(df.columns):
+                        contextstring += ' | '
+            else:
+                contextstring += ' |\n'
+        contextstring += "|----------------------------|\n"
+        for i in range(len(df)):
+            contextstring += '| '
+            for j in range(len(df.columns)):
+                value = df.iloc[i, j]
+                contextstring += f'{value}'
+                if j+1 != len(df.columns):
+                    contextstring += ' | '
+                else:
+                    contextstring += ' |\n'
+        contextstring += "```"
+
+        chen2021_returns = f'```python\ndef my_func({question[3]}): \n    \
+        """Alter this python function "my_func" to accept inputs containing \
+        {question[1]}. The function should output {question[2]} that replicates the underlying \
+        mechanism of the following examples. Do not import packages other than \
+        numpy or math. Examples: {returnstring}.\n\
+        """\n```' #Inline request
+
+        chen2021_equals = f'```python\ndef my_func({question[3]}): \n    \
+        """Alter this python function "my_func" to accept inputs containing \
+        {question[1]}. The function should output {question[2]} that replicates the underlying \
+        mechanism of the following examples. Do not import packages other than \
+        numpy or math. Examples: {noassertstring}.\n\
+        """\n```' #Inline request
+
+        wen2024 = f'{contextstring} \n Write a python function "my_func" \
+        that best fits the data within the triple barticks. The \
+        data consists of inputs containing {question[1]}. The function should \
+        output {question[2]}. Do not import packages other than numpy or math.'
+        
+        sharlin2024 = f'{textstring}\nWrite a python function "my_func" \
+        that best fits the data in CSV format within the triple barticks. The \
+        data consists of inputs containing {question[1]}. The function should \
+        output {question[2]}. Do not import packages other than numpy or math.'  #before w/o explian steps
+
+        austin2021 = f'Write a python function "my_func" \
+        that best fits the examples with inputs containing \
+        {question[1]}. The function should output {question[2]}. Do not import packages other \
+        than numpy or math. Your code should satisfy these tests: {assertstring}'  #before w/o explian steps
+
+        selectable_prompts = [austin2021, chen2021_equals, chen2021_returns, sharlin2024, wen2024]
 
         conversation = [
-            {"role": "system", "content": general_role_prompt},
-            #{"role": "assistant", "content": sample_interaction},
-            {"role": "user", "content": "Context: " + context + "\n\n Query: " + query}
-        ]
-
-        # Send the request to the OpenAI API
+                {"role": "system", "content":""},
+                {"role": "user", "content": chen2021_equals}
+            ]
+        
+        #print(wen2024)
+        
         response = self.client.chat.completions.create(
             model=self.model,
             messages=conversation,
-            seed = iteration, #allows for reporducable variations with 100 replicates.
+            seed = self.iteration, #allows for reporducable variations with 100 runs
             temperature=0.7,
-            top_p=0.95
+            #top_p=0.95
         )
 
         # Print the response
         print(response.model_dump_json(indent=2))
         print(response.choices[0].message.content)
         response_json = response.choices[0].message.content
-
-        if verify_response(response):
-            self.save_response(question, context, response)
-            logging.info("Response saved successfully.")
+        validation_flag, function_response = verify_response(response_json)
+        #print(validation_flag)
+        #print(function_response)
+        if validation_flag:
+            self.save_response(question, context, function_response, portion)
+            #logging.info("Response saved successfully.")
         else:
             logging.warning(
                 "Response from '%s' did not contain valid executable code.", 
                 question
             )
-        return response_json
+        return function_response
 
-    def save_response(self, question, context, response_json):
+    def save_response(self, question, context, response_json, portion):
+
+        if not os.path.exists(f"datasets/{self.name}/{portion}/responses"):
+            os.makedirs(f"datasets/{self.name}/{portion}/responses")
         try:
-            with open("responses.json", "a") as file:
+            with open(f"datasets/{self.name}/{portion}/responses/{self.name}_{self.iteration}_"+"test_responses.json", "a") as file:
                 entry = {
                     "question": question,
                     "context": context,
                     "response": response_json
                 }
                 file.write(json.dumps(entry) + "\n")
-            logging.info("Response logged to file.")
+            #logging.info("Response logged to file.")
         except Exception as err:
             logging.error("Failed to save response: %s", err)
