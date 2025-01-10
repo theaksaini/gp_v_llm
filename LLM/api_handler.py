@@ -146,6 +146,12 @@ class AzureAPIHandler:
         numpy or math. Examples: {noassertstring}.\n\
         """\n```' #Inline request
 
+        chen2021_question_only = f'```python\n{question_out}\ndef my_func({question[3]}): \n    \
+        """Alter this python function "my_func" to accept inputs containing \
+        {question[1]}. The function should output {question[2]}. Do not import packages other than \
+        numpy or math.\n \
+        """\n```'
+
         wen2024 = f'{contextstring} \n Write a python function "my_func" \
         that best fits the data within the triple barticks. The \
         data consists of inputs containing {question[1]}. The function should \
@@ -165,7 +171,7 @@ class AzureAPIHandler:
 
         conversation = [
                 {"role": "system", "content":""},
-                {"role": "user", "content": chen2021_equals}
+                {"role": "user", "content": chen2021_question_only}
             ]
         
         #print(wen2024)
@@ -173,7 +179,7 @@ class AzureAPIHandler:
         response = self.client.chat.completions.create(
             model=self.model,
             messages=conversation,
-            seed = self.iteration, #allows for reporducable variations with 100 runs
+            seed = self.iteration, #allows for reproducable variations with 100 runs
             temperature=0.7,
             #top_p=0.95
         )
@@ -200,7 +206,7 @@ class AzureAPIHandler:
         if not os.path.exists(f"datasets/{self.name}/{portion}/responses"):
             os.makedirs(f"datasets/{self.name}/{portion}/responses")
         try:
-            with open(f"datasets/{self.name}/{portion}/responses/{self.name}_{self.iteration}_"+"test_responses.json", "a") as file:
+            with open(f"datasets/{self.name}/{portion}/responses/{self.name}_{self.iteration}_"+"questiononly_responses.json", "a") as file:
                 entry = {
                     "question": question,
                     "context": context,

@@ -21,19 +21,19 @@ PSB2_DATASETS = ['basement', 'bouncing-balls', 'bowling', 'camel-case',
 
 def main():
     """Main function to handle question submission and training data."""
-
+ 
     test_names = PSB2_DATASETS
-    promptlist=['Test']#['Austin2021', 'ChenEqual', 'ChenReturn', 'Sharlin2024', 'Wen2024']
-    prompt_bothcount=['Test_both']#['Austin2021_both', 'ChenEqual_both', 'ChenReturn_both', 'Sharlin2024_both', 'Wen2024_both']
+    promptlist=['QuestionOnly']#['Austin2021', 'ChenEqual', 'ChenReturn', 'Sharlin2024', 'Wen2024']
+    prompt_bothcount=['QuestionOnly_both']#['Austin2021_both', 'ChenEqual_both', 'ChenReturn_both', 'Sharlin2024_both', 'Wen2024_both']
     colnames = ['Task', 'Result']
     total_vals = []
     total_frame = pd.DataFrame(columns=promptlist)
     for i in test_names:
         newcolnames = [f'{i}_iteration', 'Result']
         localrow = []
-        data = pd.read_csv(f'datasets/{i}/{i}_200_test_per_dict.csv', names=newcolnames, header=None, converters={"Result": convert_to_list})
+        data = pd.read_csv(f'datasets/{i}/{i}_200_questiononly_per_dict.csv', names=newcolnames, header=None, converters={"Result": convert_to_list})
         df = data.drop('Result', axis=1, inplace=False)
-        for promptcounter, j in enumerate(['_test']):#['_austin2021', '_chenequal', '_chenreturn', '', '_wen2024']):
+        for promptcounter, j in enumerate(['_questiononly']):#['_austin2021', '_chenequal', '_chenreturn', '', '_wen2024']):
             data = pd.read_csv(f'datasets/{i}/{i}_200{j}_per_dict.csv', names=newcolnames, header=None, converters={"Result": convert_to_list})
             split = pd.DataFrame(data['Result'].to_list(), columns=[f'{promptlist[promptcounter]}_train', f'{promptlist[promptcounter]}_test'])
             print(split)
@@ -41,7 +41,7 @@ def main():
             count = ((split[f'{promptlist[promptcounter]}_train'] == 1.0) & (split[f'{promptlist[promptcounter]}_test'] == 1.0)).sum()
             localrow.append(count)
             df = pd.concat([df, split], axis=1)
-        otherframe = {'Test_both': localrow}
+        otherframe = {'QuestionOnly_both': localrow}
         #{'Austin2021_both': [localrow[0]],
         #              'ChenEqual_both': [localrow[1]], 
         #              'ChenReturn_both': [localrow[2]], 
@@ -50,10 +50,10 @@ def main():
         print(otherframe)
         outerframe = pd.DataFrame(otherframe)
         total_frame = pd.concat([total_frame, outerframe], ignore_index=True)
-        df.to_csv(f'datasets/{i}/percent_test_results.csv', index=False)
+        df.to_csv(f'datasets/{i}/percent_questiononly_results.csv', index=False)
         print(df)
 
-    df = pd.read_csv(f'datasets/Test.csv', names=colnames, header=None)
+    df = pd.read_csv(f'datasets/questiononly.csv', names=colnames, header=None)
     df.drop('Result', axis=1, inplace=True)
     #print(df)
     for i in promptlist:
@@ -65,7 +65,7 @@ def main():
         df = pd.concat([df, split], axis=1)
         df = pd.concat([df, total_frame[f'{i}_both']], axis=1)
 
-    df.to_csv('datasets/test_results.csv')
+    df.to_csv('datasets/questiononly_results.csv')
     print('Run Finished')
 
 def convert_to_list(x):
