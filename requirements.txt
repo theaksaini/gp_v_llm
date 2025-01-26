@@ -1,7 +1,4 @@
 requests
 openai
 pandas
-json
-re
-unitest
 psb2
