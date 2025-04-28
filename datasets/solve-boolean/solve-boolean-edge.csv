@@ -1,0 +1,11 @@
+input1,output1
+t,true
+f,false
+f&f,false
+f&t,false
+t&f,false
+t&t,true
+f|f,false
+f|t,true
+t|f,true
+t|t,true

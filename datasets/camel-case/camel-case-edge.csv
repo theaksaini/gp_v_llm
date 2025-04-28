@@ -1,0 +1,12 @@
+input1,output1
+,
+nospaceordash,nospaceordash
+two-words,twoWords
+two words,two words
+all separate words,all separate words
+all-one-word-dashed,allOneWordDashed
+loooooong-wooooords,loooooongWooooords
+loooooong wooooords,loooooong wooooords
+a-b-c-d-e-f-g-h-i-j,aBCDEFGHIJ
+a b c d e f g h i j,a b c d e f g h i j
+saaaaaaaaaaaaaaaaame,saaaaaaaaaaaaaaaaame

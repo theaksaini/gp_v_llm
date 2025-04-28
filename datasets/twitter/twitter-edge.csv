@@ -1,0 +1,7 @@
+input1,output1
+"",You didn't type anything
+"1",Your tweet has 1 characters
+"max length tweet that just contains letters and spaces even SOME CAPITAL LETTERS just to MAKE it INTERESTING now repeeeeeeeeeEEEEEEEeeeat it",Your tweet has 140 characters
+"40172875*&(&(%^^*!@&#()!@&^(*$787031264123984721-43214876*%^#!(@^$_!@^%#$(!#@%$(01234~~``)",Your tweet has 90 characters
+"Tooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooolong1",Too many characters
+"(@)&#N)&#@!M#&17t8023n217830123bn6 BN23780BC3879N01nc3n473N962n9768062BC3718N396b21v8365n9072B638705b097B6*&b%&%b(*B5*&%b7%(*vb&V8%v&(85V80%0857(%v97%(*&%v87c%&*c ()0*^c%08v^mN098)vf%9P8V6TfB97b99870)",Too many characters
