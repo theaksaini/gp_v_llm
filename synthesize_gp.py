@@ -2,15 +2,10 @@ import pandas as pd
 import numpy as np
 import random
 import time
-import sys
 import os
 import pickle
 import traceback
-
-from pyshgp.gp.estimators import PushEstimator
-from pyshgp.gp.genome import GeneSpawner
-
-
+import subprocess
 
 import datautils
 import GP.gp_utils as gp_utils
@@ -20,103 +15,45 @@ import GP.gp_utils as gp_utils
 # generations in our experimental GP runs.
 
 
-def loop_through_tasks(task_id_lists, base_save_folder, data_dir, metadata_file, num_runs, ga_params):
+def loop_through_tasks(task_id_lists, base_save_folder, num_runs, training_set_size):
     for t, taskid in enumerate(task_id_lists):
+        save_folder = f"{base_save_folder}/Size{training_set_size}/{taskid}"
         for r in range(num_runs):
-            save_folder = f"{base_save_folder}/{taskid}_{r}"
+            save_file = f"{save_folder}/{r}.txt"
             time.sleep(random.random()*5)
-            if not os.path.exists(save_folder):
-                os.makedirs(save_folder)
-            else:
+            if os.path.exists(save_file):
                 continue
+            else:
+                if not os.path.exists(save_folder):
+                    os.makedirs(save_folder)
 
-            print("working on ")
-            print(save_folder)
 
-            print("loading data")
-                
-            # Split the data into training and testing sets
-            X_train, y_train, X_test, y_test = datautils.generate_training_test_data(data_dir, taskid, r)                    
-            try:
-                scores = pd.DataFrame(columns = ['taskid','run','runtime','train_error','test_error','train_unsolved','test_unsolved'])  
-                print("Starting the Evolution: ")
-
-                metadata = datautils.get_problem_metadata(metadata_file, taskid)
-                spawner = GeneSpawner(**metadata)
-
-                est = PushEstimator(
-                    search="GA",
-                    population_size=ga_params["population_size"],
-                    max_generations=ga_params["max_generations"],
-                    spawner=spawner,
-                    simplification_steps=10,
-                    last_str_from_stdout=True,
-                    parallelism=True,
-                    verbose=3
-                )
-
-                start = time.time()
-                est.fit(X=X_train, y=y_train)
-                end = time.time()
-                
-                this_score = {}
-                this_score["runtime"] = end - start
-                
-                assert len(est.solution.error_vector) == len(y_train)
-                this_score["train_total_error"] = np.sum(est.solution.error_vector)
-
-                # Record the number of unsolved cases in the training set
-                this_score["train_unsolved"] = np.sum(est.solution.error_vector > 0)
-
-                assert len(est.score(X_test, y_test)) == len(y_test)
-                this_score["test_total_error"] = np.sum(est.score(X_test, y_test))
-
-                # Record the number of unsolved cases in the training set
-                this_score["test_unsolved"] = np.sum(est.score(X_test, y_test) > 0)
-
-                this_score["taskid"] = taskid
-                this_score["run"] = r
-
-                scores.loc[len(scores.index)] = this_score
-
-                with open(f"{save_folder}/scores.pkl", "wb") as f:
-                    pickle.dump(scores, f)
-
-                return
-            
-            except Exception as e:
-                trace =  traceback.format_exc()
-                pipeline_failure_dict = {"taskid": taskid,  "error": str(e), "trace": trace}
-                print("failed on ")
+                print("working on ")
                 print(save_folder)
-                print(e)
-                print(trace)
 
-                with open(f"{save_folder}/failed.pkl", "wb") as f:
-                    pickle.dump(pipeline_failure_dict, f)
+                # Build the command based on training set size
+                if training_set_size == 200:
+                    namespace = f"clojush.problems.psb2size200.{taskid}"
+                elif training_set_size == 50:
+                    namespace = f"clojush.problems.psb2size50.{taskid}"
+                else:
+                    print(f"Unsupported training_set_size: {training_set_size}")
+                    continue
 
-                return
-        
+                cmd = ['lein', 'run', namespace]
+
+                # Run the command and save the output to a file
+                with open(save_file, 'w') as f:
+                    subprocess.run(cmd, stdout=f, stderr=subprocess.STDOUT, cwd='Clojush')
+            
+            return 
+
     print("all finished")
-
-
 
 
 if __name__ == "__main__":
     task_id_lists = datautils.PSB2_DATASETS
-    base_save_folder = "results"
-    data_dir = "../Datasets/PSB2/datasets/"
-    metadata_file = "PSB2_metadata.csv"
-    num_runs_local = 5
-    ga_params_local = {
-        "population_size": 10,
-        "max_generations": 50
-    }
-    num_runs_hpc = 100
-    ga_params_hpc = {
-        "population_size": 1000,
-        "max_generations": 300
-    }
+    base_save_folder = "PushGP_Results"
+    num_runs = 100
 
-
-    loop_through_tasks(task_id_lists, base_save_folder, data_dir, metadata_file, num_runs_local, ga_params_local)
+    loop_through_tasks(task_id_lists, base_save_folder, num_runs, 200)

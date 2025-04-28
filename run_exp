@@ -1,0 +1,18 @@
+#!/bin/bash -l
+
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+#SBATCH --time=07-00:00:00
+#SBATCH --mem=20000MB
+#SBATCH --job-name=ga_reweigh_test
+#SBATCH -p defq,moore
+#SBATCH --array=1-500
+#SBATCH -o logs/output.%j_%a.out # STDOUT
+
+
+source /home/sainia3/anaconda3/etc/profile.d/conda.sh
+conda activate tpotenv
+
+srun -u python synthesize_gp.py 
+

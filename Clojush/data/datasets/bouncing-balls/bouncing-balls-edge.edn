@@ -1,0 +1,10 @@
+{:input1 1.001, :input2 1.0, :input3 1, :output1 2.001}
+{:input1 100.0, :input2 99.999, :input3 20, :output1 3999.599534511501}
+{:input1 100.0, :input2 1.0, :input3 20, :output1 102.02020201974588}
+{:input1 15.319, :input2 5.635, :input3 1, :output1 20.954}
+{:input1 2.176, :input2 1.787, :input3 1, :output1 3.963}
+{:input1 17.165, :input2 5.627, :input3 1, :output1 22.791999999999998}
+{:input1 60.567, :input2 37.053, :input3 1, :output1 97.62}
+{:input1 62.145, :input2 62.058, :input3 1, :output1 124.203}
+{:input1 36.311, :input2 33.399, :input3 1, :output1 69.71000000000001}
+{:input1 46.821, :input2 8.151, :input3 1, :output1 54.971999999999994}
