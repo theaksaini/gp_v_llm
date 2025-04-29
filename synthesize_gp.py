@@ -17,16 +17,14 @@ import GP.gp_utils as gp_utils
 
 def loop_through_tasks(task_id_lists, base_save_folder, num_runs, training_set_size):
     for t, taskid in enumerate(task_id_lists):
-        save_folder = f"{base_save_folder}/Size{training_set_size}/{taskid}"
         for r in range(num_runs):
-            save_file = f"{save_folder}/{r}.txt"
+            save_folder = f"{base_save_folder}/Size{training_set_size}/{taskid}/replicate_{r}"
             time.sleep(random.random()*5)
-            if os.path.exists(save_file):
+            if os.path.exists(save_folder):
                 continue
             else:
                 if not os.path.exists(save_folder):
                     os.makedirs(save_folder)
-
 
                 print("working on ")
                 print(save_folder)
@@ -43,6 +41,7 @@ def loop_through_tasks(task_id_lists, base_save_folder, num_runs, training_set_s
                 cmd = ['lein', 'run', namespace]
 
                 # Run the command and save the output to a file
+                save_file = f"{save_folder}/output.txt"
                 with open(save_file, 'w') as f:
                     subprocess.run(cmd, stdout=f, stderr=subprocess.STDOUT, cwd='Clojush')
             

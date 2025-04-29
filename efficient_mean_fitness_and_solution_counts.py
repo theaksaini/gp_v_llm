@@ -73,7 +73,7 @@ def print_stats(outputDirectory, verbose=True):
     errorThresholdPerCase = maxsize
     numCases = maxsize
 
-    fileName0 = (outputFilePrefix + str(i) + outputFileSuffix)
+    fileName0 = f"{outputFilePrefix}{i}{outputFileSuffix}/output.txt"
     f0 = open(outputDirectory + fileName0)
 
     for line in f0:
@@ -100,7 +100,8 @@ def print_stats(outputDirectory, verbose=True):
                 print
 
         runs = i + 1 # After this loop ends, runs should be correct
-        fileName = (outputFilePrefix + str(i) + outputFileSuffix)
+        #fileName = (outputFilePrefix + str(i) + outputFileSuffix)
+        fileName = f"{outputFilePrefix}{i}{outputFileSuffix}/output.txt"
     #    f = open(outputDirectory + fileName)
 
         #final = False
@@ -283,24 +284,24 @@ if __name__ == "__main__":
         outputDirectory =sys.argv[1] 
 
     #outputFilePrefix = sys.argv[2]
-    outputFilePrefix = ""
-    outputFileSuffix = ".txt"
+    outputFilePrefix = "replicate_"
+    outputFileSuffix = ""
 
 
     errorType = "float"
 
     if sys.argv[2]=="all":
         for task in datautils.PSB2_DATASETS:
-            if os.path.exists(outputDirectory+"/"+task):
+            if os.path.exists(f"{outputDirectory}/{task}"):
                 print("------------------------------------------------------------")
                 print("Processing Task: ", task)
-                print_stats(outputDirectory+"/"+task, False)
+                print_stats(f"{outputDirectory}/{task}/", False)
             else:
                 print("------------------------------------------------------------")
                 print("Hasn't started on task: ", task)
 
     else:
-        print_stats(outputDirectory+"/"+sys.argv[2], True)
+        print_stats(f"{outputDirectory}/{sys.argv[2]}/output.txt", True)
 
 
 
