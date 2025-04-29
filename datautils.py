@@ -143,16 +143,6 @@ def generate_training_test_data(data_dir, dataset_name, rand_seed, portion):
 
     return X_train, y_train, X_test, y_test
 
-
-for names in PSB2_DATASETS:
-    for i in [200]:
-        X_train, y_train, X_test, y_test = generate_training_test_data(data_dir=\
-            'datasets', dataset_name=names, rand_seed=42, portion=i)
-        print(X_train, y_train, X_test, y_test, i)
-    print(names)
-    print("DONE")
-
-
 def get_problem_metadata(metadata_file, problem):
     """Extracts the relevant information from the datasets_info.csv file for a given problem, to be passed to the GeneSpawner constructor."""
     
@@ -186,3 +176,12 @@ def get_problem_metadata(metadata_file, problem):
         "literals": non_erc_literals,
         "erc_generators": erc_generators,
     }
+
+if __name__ == "__main__":
+    for names in PSB2_DATASETS:
+        for i in [200]:
+            X_train, y_train, X_test, y_test = generate_training_test_data(data_dir=\
+                'datasets', dataset_name=names, rand_seed=42, portion=i)
+            print(X_train, y_train, X_test, y_test, i)
+        print(names)
+        print("DONE")
